@@ -6,6 +6,7 @@ import ServiceManager from './components/ServiceManager';
 import FinanceManager from './components/FinanceManager';
 import RecordManager from './components/RecordManager';
 import ManageManager from './components/ManageManager';
+import SettingsManager from './components/SettingsManager';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { Page } from './types';
@@ -66,6 +67,11 @@ const App: React.FC = () => {
             {currentPage === Page.MANAGE && (
               <div className="h-full">
                 <ManageManager activeSubPage={activeSubPage} />
+              </div>
+            )}
+            {currentPage === Page.SETTINGS && (
+              <div className="h-full">
+                <SettingsManager activeSubPage={activeSubPage} />
               </div>
             )}
           </div>
