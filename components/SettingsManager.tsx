@@ -27,6 +27,9 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ activeSubPage }) => {
   // Service Package State
   const [servicePackages, setServicePackages] = useState<ServicePackage[]>(SERVICE_PACKAGES);
 
+  // My Account State
+  const [accountTab, setAccountTab] = useState('我的资料');
+
   const renderBaseSettings = () => (
     <div className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
       <div className="max-w-4xl">
@@ -434,6 +437,111 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ activeSubPage }) => {
     </div>
   );
 
+  const renderMyAccount = () => (
+    <div className="flex-1 flex flex-col overflow-hidden bg-white">
+      {/* Tabs */}
+      <div className="border-b border-gray-100 px-4 h-10 flex items-center bg-white sticky top-0 z-10">
+        <div className="flex space-x-8">
+          {['我的资料', '修改密码'].map(tab => (
+            <div
+              key={tab}
+              onClick={() => setAccountTab(tab)}
+              className={`h-10 flex items-center text-[13px] cursor-pointer relative transition-colors ${accountTab === tab ? 'text-indigo-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              {tab}
+              {accountTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600"></div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {accountTab === '我的资料' ? (
+          <div className="p-8">
+            {/* Header / Basic Info */}
+            <div className="flex items-start border-b border-gray-100 pb-8">
+              <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-sm shrink-0">
+                <img
+                  src="https://scrm.oss-cn-beijing.aliyuncs.com/assets/union_headimg-20a3fc4b.png"
+                  className="w-full h-full object-cover"
+                  alt="Avatar"
+                />
+              </div>
+              <div className="ml-6 flex flex-col justify-between h-24 py-1">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-800">门店管理员</h2>
+                  <div className="mt-3 flex items-center text-sm text-gray-500">
+                    <span className="mr-8">账号：mc6yhe</span>
+                    <button className="text-indigo-600 font-bold hover:underline flex items-center">
+                      <i className="far fa-edit mr-1.5"></i> 编辑资料
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Grid */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-12">
+              {[
+                { label: '门店', value: '测试门店' },
+                { label: '部门', value: '管理层' },
+                { label: '角色', value: '负责人' },
+                { label: '手机', value: '--' },
+                { label: 'QQ', value: '--' },
+                { label: '销售资源配额', value: '不限' },
+                {
+                  label: '微信登录',
+                  value: (
+                    <div className="flex items-center">
+                      <span className="text-gray-400 mr-2">未绑定</span>
+                      <button className="text-indigo-600 font-bold hover:underline">点击绑定</button>
+                    </div>
+                  )
+                },
+                { label: '座机', value: '--' },
+                { label: '邮箱', value: '--' },
+                { label: '微信', value: '--' },
+                { label: '每日资源配额', value: '不限' },
+                { label: '创建时间', value: '2026-01-16 13:53' },
+                { label: '登录次数', value: '6' },
+                {
+                  label: '二维码',
+                  value: (
+                    <div className="w-10 h-10 bg-gray-100 rounded p-1">
+                      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAIAAAD2HxkiAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjQyNkY1OTlDQURGODExRTlCNDNFRTJBNzAxMTQxQTQyIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjQyNkY1OTlEQURGODExRTlCNDNFRTJBNzAxMTQxQTQyIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NDI2RjU5OUFBREY4MTFFOUI0M0VFMkE3MDExNDFBNDIiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NDI2RjU5OUJBREY4MTFFOUI0M0VFMkE3MDExNDFBNDIiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7solWjAAAHNklEQVR42uzd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" alt="QR Code" className="w-full h-full" />
+                    </div>
+                  )
+                },
+                { label: '最后登录', value: '2026-01-23 18:04' },
+                { label: '登录IP', value: '27.8.140.136' },
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center text-sm">
+                  <span className="w-24 text-gray-500 shrink-0">{item.label}:</span>
+                  <div className="flex-1 text-gray-700 font-medium">{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-12 flex flex-col items-center justify-center h-full">
+            <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center max-w-md w-full">
+              <i className="fas fa-lock text-gray-200 text-6xl mb-6"></i>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">修改密码</h3>
+              <p className="text-gray-400 text-center mb-8">为了您的账户安全，建议定期修改密码。</p>
+
+              <div className="w-full space-y-4">
+                <input type="password" placeholder="请输入旧密码" className="w-full h-10 border border-gray-300 rounded px-4 focus:outline-none focus:border-indigo-500" />
+                <input type="password" placeholder="请输入新密码" className="w-full h-10 border border-gray-300 rounded px-4 focus:outline-none focus:border-indigo-500" />
+                <input type="password" placeholder="请再次确认新密码" className="w-full h-10 border border-gray-300 rounded px-4 focus:outline-none focus:border-indigo-500" />
+                <button className="w-full bg-indigo-600 text-white font-bold py-2 rounded shadow-md hover:bg-indigo-700 transition-colors">确认修改</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   const renderFollowUpTemplate = () => (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5]">
       {/* Search Bar */}
@@ -541,7 +649,8 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ activeSubPage }) => {
       {activeSubPage === '话术库' && renderChatScriptLibrary()}
       {activeSubPage === '跟进模板' && renderFollowUpTemplate()}
       {activeSubPage === '服务套餐' && renderServicePackage()}
-      {activeSubPage !== '基础设置' && activeSubPage !== '话术库' && activeSubPage !== '跟进模板' && activeSubPage !== '服务套餐' && (
+      {activeSubPage === '我的账号' && renderMyAccount()}
+      {activeSubPage !== '基础设置' && activeSubPage !== '话术库' && activeSubPage !== '跟进模板' && activeSubPage !== '服务套餐' && activeSubPage !== '我的账号' && (
         <div className="flex-1 overflow-y-auto p-12 flex flex-col items-center justify-center bg-[#f0f2f5]">
           <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center">
             <img src="https://scrm.oss-cn-beijing.aliyuncs.com/assets/no_data-78230080.png" className="w-40 opacity-60" alt="No data" />
