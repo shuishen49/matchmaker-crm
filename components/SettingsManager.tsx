@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CHAT_SCRIPTS, CHAT_CATEGORIES, ChatScript } from '../constants';
+import { CHAT_SCRIPTS, CHAT_CATEGORIES, ChatScript, SERVICE_PACKAGES, ServicePackage } from '../constants';
 
 interface SettingsManagerProps {
   activeSubPage: string;
@@ -23,6 +23,9 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ activeSubPage }) => {
 
   // Follow-up Template State
   const [templateSearchText, setTemplateSearchText] = useState('');
+
+  // Service Package State
+  const [servicePackages, setServicePackages] = useState<ServicePackage[]>(SERVICE_PACKAGES);
 
   const renderBaseSettings = () => (
     <div className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
@@ -335,6 +338,102 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ activeSubPage }) => {
     </div>
   );
 
+  const renderServicePackage = () => (
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5]">
+      {/* Alert */}
+      <div className="p-4 bg-white">
+        <div className="bg-orange-50 border border-orange-100 rounded p-3 flex items-start space-x-3">
+          <i className="fas fa-exclamation-circle text-orange-400 mt-0.5"></i>
+          <p className="text-[13px] text-gray-600 leading-relaxed">
+            设置服务套餐，可用于业绩预测，也可用于创建合同时，选择相应的套餐后，快速自动填写相关服务参数。服务级别请到自定义参数中设置
+          </p>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-hidden flex flex-col p-4 space-y-4 pt-0">
+        {/* Toolbar */}
+        <div className="bg-white p-3 rounded shadow-sm border border-gray-100 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <button className="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 rounded text-sm hover:bg-gray-50 hover:border-indigo-400 transition-colors">添加套餐</button>
+            <span className="iconfont icon-a-1 text-gray-400 cursor-pointer hover:text-indigo-600 fz17"></span>
+          </div>
+        </div>
+
+        {/* Table Area */}
+        <div className="flex-1 overflow-hidden bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col">
+          <div className="overflow-x-auto overflow-y-auto custom-scrollbar flex-1">
+            <table className="w-full text-left border-collapse table-fixed min-w-[1200px]">
+              <thead>
+                <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold sticky top-0 z-10">
+                  <th className="px-4 py-3 w-20 sticky left-0 bg-[#f8f9fb] z-20 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">ID</th>
+                  <th className="px-4 py-3 w-32">服务级别</th>
+                  <th className="px-4 py-3 w-64">套餐标题</th>
+                  <th className="px-4 py-3 w-32">时长</th>
+                  <th className="px-4 py-3 w-40">价格</th>
+                  <th className="px-4 py-3 w-32">安排人数</th>
+                  <th className="px-4 py-3">备注</th>
+                  <th className="px-4 py-3 w-32 text-center">是否启用</th>
+                  <th className="px-4 py-3 w-32 sticky right-0 bg-[#f8f9fb] z-20 text-center border-l border-gray-50 shadow-[-2px_0_5px_rgba(0,0,0,0.02)]">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {servicePackages.map(pkg => (
+                  <tr key={pkg.id} className="hover:bg-gray-50/50">
+                    <td className="px-4 py-4 text-sm text-gray-500 sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{pkg.id}</td>
+                    <td className="px-4 py-4 text-sm text-gray-600 font-medium">{pkg.level}</td>
+                    <td className="px-4 py-4 text-sm text-gray-800">{pkg.title}</td>
+                    <td className="px-4 py-4 text-sm text-gray-600">{pkg.duration}</td>
+                    <td className="px-4 py-4 text-sm text-gray-900 font-bold">
+                      <span className="text-xs mr-0.5">￥</span>{pkg.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-600">{pkg.headcount}</td>
+                    <td className="px-4 py-4 text-sm text-gray-400">{pkg.remarks}</td>
+                    <td className="px-4 py-4 text-center">
+                      <div
+                        onClick={() => {
+                          const newPkgs = servicePackages.map(p => p.id === pkg.id ? { ...p, enabled: !p.enabled } : p);
+                          setServicePackages(newPkgs);
+                        }}
+                        className={`w-10 h-5 rounded-full relative cursor-pointer mx-auto transition-colors ${pkg.enabled ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                      >
+                        <div className="absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all" style={{ left: pkg.enabled ? '22px' : '2px' }}></div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-gray-50 shadow-[-2px_0_5px_rgba(0,0,0,0.02)]">
+                      <button className="text-indigo-600 text-[13px] font-bold hover:underline mx-2">编辑</button>
+                      <button className="text-rose-500 text-[13px] font-bold hover:underline mx-2">删除</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="bg-white border-t border-gray-50 px-4 py-3 flex items-center justify-end space-x-2">
+            <span className="text-xs text-gray-500">共 {servicePackages.length} 条</span>
+            <div className="flex items-center border border-gray-200 rounded px-2 py-1 text-xs text-gray-600 cursor-pointer hover:border-indigo-400 transition-colors">
+              <span>20条/页</span>
+              <i className="fas fa-caret-down ml-2"></i>
+            </div>
+            <button disabled className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded text-gray-400 cursor-not-allowed">
+              <i className="fas fa-chevron-left text-[10px]"></i>
+            </button>
+            <button className="w-8 h-8 flex items-center justify-center border border-indigo-500 rounded bg-white text-indigo-600 text-xs font-bold">1</button>
+            <button disabled className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded text-gray-400 cursor-not-allowed">
+              <i className="fas fa-chevron-right text-[10px]"></i>
+            </button>
+            <div className="flex items-center text-xs text-gray-600">
+              <span className="mr-2">前往</span>
+              <input type="number" defaultValue={1} className="w-10 h-8 border border-gray-200 rounded text-center focus:outline-none focus:border-indigo-400" />
+              <span className="ml-2">页</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderFollowUpTemplate = () => (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5]">
       {/* Search Bar */}
@@ -441,7 +540,8 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ activeSubPage }) => {
       {activeSubPage === '基础设置' && renderBaseSettings()}
       {activeSubPage === '话术库' && renderChatScriptLibrary()}
       {activeSubPage === '跟进模板' && renderFollowUpTemplate()}
-      {activeSubPage !== '基础设置' && activeSubPage !== '话术库' && activeSubPage !== '跟进模板' && (
+      {activeSubPage === '服务套餐' && renderServicePackage()}
+      {activeSubPage !== '基础设置' && activeSubPage !== '话术库' && activeSubPage !== '跟进模板' && activeSubPage !== '服务套餐' && (
         <div className="flex-1 overflow-y-auto p-12 flex flex-col items-center justify-center bg-[#f0f2f5]">
           <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center">
             <img src="https://scrm.oss-cn-beijing.aliyuncs.com/assets/no_data-78230080.png" className="w-40 opacity-60" alt="No data" />

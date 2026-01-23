@@ -71,3 +71,47 @@ export const CHAT_CATEGORIES = [
   '服务关单话术', '邀约五步总结', 'VIP一对一服务规范',
   'VIP一对一服务流程', '心灵匹配 十六种恋爱'
 ];
+
+export interface ServicePackage {
+  id: string;
+  level: string;
+  title: string;
+  duration: string;
+  price: number;
+  headcount: number;
+  remarks: string;
+  enabled: boolean;
+}
+
+export const SERVICE_PACKAGES: ServicePackage[] = [
+  {
+    id: '66',
+    level: '至尊会员',
+    title: '甜蜜约会套餐',
+    duration: '180天',
+    price: 16999.00,
+    headcount: 5,
+    remarks: '--',
+    enabled: true
+  },
+  {
+    id: '65',
+    level: '钻石会员',
+    title: '终身伴侣套餐',
+    duration: '120天',
+    price: 8999.00,
+    headcount: 4,
+    remarks: '--',
+    enabled: true
+  },
+  {
+    id: '64',
+    level: '金牌会员',
+    title: '精英速配套餐',
+    duration: '90天',
+    price: 6999.00,
+    headcount: 3,
+    remarks: '--',
+    enabled: true
+  }
+];
