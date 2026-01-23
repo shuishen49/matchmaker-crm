@@ -14,6 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
   const [activeFinanceSubMenu, setActiveFinanceSubMenu] = useState('合同管理');
   const [activeRecordsSubMenu, setActiveRecordsSubMenu] = useState('跟进小记');
   const [activeManageSubMenu, setActiveManageSubMenu] = useState('部门管理');
+  const [activeSettingsSubMenu, setActiveSettingsSubMenu] = useState('基础设置');
 
   const primaryMenu = [
     { id: Page.DASHBOARD, label: '数据', icon: 'fa-chart-bar' },
@@ -22,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
     { id: Page.FINANCE, label: '财务', icon: 'fa-file-invoice-dollar' },
     { id: Page.RECORDS, label: '记录', icon: 'fa-list-alt' },
     { id: Page.MANAGE, label: '管理', icon: 'fa-tasks' },
-    { id: 'settings', label: '设置', icon: 'fa-cog' },
+    { id: Page.SETTINGS, label: '设置', icon: 'fa-cog' },
   ];
 
   const salesSubMenu = [
@@ -47,6 +48,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
     '部门管理', '角色管理', '红娘管理'
   ];
 
+  const settingsSubMenu = [
+    '基础设置', '话术库', '跟进模板', '服务套餐', '我的账号'
+  ];
+
   const handlePrimaryClick = (id: any) => {
     if (Object.values(Page).includes(id as Page)) {
       let sub;
@@ -55,6 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
       else if (id === Page.FINANCE) sub = activeFinanceSubMenu;
       else if (id === Page.RECORDS) sub = activeRecordsSubMenu;
       else if (id === Page.MANAGE) sub = activeManageSubMenu;
+      else if (id === Page.SETTINGS) sub = activeSettingsSubMenu;
       onPageChange(id as Page, sub);
     }
   };
@@ -65,10 +71,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
     else if (page === Page.FINANCE) setActiveFinanceSubMenu(sub);
     else if (page === Page.RECORDS) setActiveRecordsSubMenu(sub);
     else if (page === Page.MANAGE) setActiveManageSubMenu(sub);
+    else if (page === Page.SETTINGS) setActiveSettingsSubMenu(sub);
     onPageChange(page, sub);
   };
 
-  const isModulePage = (page: Page) => [Page.RESOURCES, Page.SERVICE, Page.FINANCE, Page.RECORDS, Page.MANAGE].includes(page);
+  const isModulePage = (page: Page) => [Page.RESOURCES, Page.SERVICE, Page.FINANCE, Page.RECORDS, Page.MANAGE, Page.SETTINGS].includes(page);
 
   return (
     <div className="flex h-full shadow-lg z-20 shrink-0">
@@ -116,7 +123,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
               {currentPage === Page.RESOURCES ? '销售' : 
                currentPage === Page.SERVICE ? '服务' : 
                currentPage === Page.FINANCE ? '财务' : 
-               currentPage === Page.RECORDS ? '记录' : '管理'}
+               currentPage === Page.RECORDS ? '记录' :
+               currentPage === Page.MANAGE ? '管理' : '设置'}
             </h1>
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -124,7 +132,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
               {(currentPage === Page.RESOURCES ? salesSubMenu : 
                 currentPage === Page.SERVICE ? serviceSubMenu : 
                 currentPage === Page.FINANCE ? financeSubMenu : 
-                currentPage === Page.RECORDS ? recordsSubMenu : manageSubMenu).map((sub) => (
+                currentPage === Page.RECORDS ? recordsSubMenu :
+                currentPage === Page.MANAGE ? manageSubMenu : settingsSubMenu).map((sub) => (
                 <li
                   key={sub}
                   onClick={() => handleSubMenuClick(currentPage, sub)}
@@ -132,7 +141,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange, isCollapse
                     (currentPage === Page.RESOURCES ? activeSalesSubMenu : 
                      currentPage === Page.SERVICE ? activeServiceSubMenu : 
                      currentPage === Page.FINANCE ? activeFinanceSubMenu : 
-                     currentPage === Page.RECORDS ? activeRecordsSubMenu : activeManageSubMenu) === sub 
+                     currentPage === Page.RECORDS ? activeRecordsSubMenu :
+                     currentPage === Page.MANAGE ? activeManageSubMenu : activeSettingsSubMenu) === sub
                     ? 'text-indigo-600 bg-indigo-50 font-bold border-r-4 border-indigo-500' 
                     : 'text-gray-600 hover:bg-gray-50'
                   }`}

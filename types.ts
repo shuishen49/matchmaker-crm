@@ -6,7 +6,8 @@ export enum Page {
   SERVICE = 'SERVICE',
   FINANCE = 'FINANCE',
   RECORDS = 'RECORDS',
-  MANAGE = 'MANAGE'
+  MANAGE = 'MANAGE',
+  SETTINGS = 'SETTINGS'
 }
 
 export interface SummaryCardProps {
