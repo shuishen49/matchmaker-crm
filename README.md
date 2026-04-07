@@ -1,95 +1,75 @@
 # Matchmaker CRM
 
-一个给婚恋机构用的 CRM 前端工作台（React + Vite），可直接部署到 GitHub Pages。
+婚恋机构 CRM 前端演示工作台（React + Vite），覆盖销售、服务、财务、记录、管理、设置全流程页面，可本地预览，也可发布到 GitHub Pages。
 
----
+## 功能亮点
 
-## 项目预览
+- **销售全链路**：待分配资源、我的资源、到店预测/登记、面谈、协作、公海、回收站、合同、收款、短信记录
+- **服务全链路**：待分配客户、我的客户、约见管理、关单库、嘉宾库、服务合同
+- **财务全链路**：合同管理、收款管理、退款管理、红娘业绩（含目标/完成度）
+- **运营支持**：跟进小记、导入/导出记录、部门/角色/红娘管理、话术库/模板/套餐/账号设置
+- **演示可用**：关键页面均有真实演示数据，不含“开发中/暂无数据”空壳
 
-> 建议把下面几张图补上后，README 观感会立刻提升。
+## 项目截图
 
 ### 登录页
 ![登录页](./docs/screenshots/login.png)
 
-### 工作台首页（Dashboard）
-![工作台首页](./docs/screenshots/dashboard.png)
+### 数据首页
+![数据首页](./docs/screenshots/dashboard.png)
 
-### 资源管理
-![资源管理](./docs/screenshots/resources.png)
+### 销售管理（资源）
+![销售管理](./docs/screenshots/resources.png)
 
-### 服务管理 / 财务管理
+### 服务 / 财务
 ![服务与财务](./docs/screenshots/service-finance.png)
 
-### 记录管理 / 系统设置
+### 记录 / 设置
 ![记录与设置](./docs/screenshots/records-settings.png)
 
----
-
-## 功能简介
-
-- 客户资源管理：线索、状态、分配
-- 服务流程管理：服务节点与跟进
-- 财务管理：收支记录与统计视图
-- 业务记录管理：操作留痕、查询追踪
-- 系统管理：基础配置、权限相关页面
-
----
-
-## 快速启动
+## 本地运行
 
 ```bash
 npm install
 npm run dev
 ```
 
----
+默认开发地址（Vite）：`http://127.0.0.1:3000/`
 
-## 构建静态站点
+## 本地预览（生产构建）
 
 ```bash
 npm run build
+npm run preview -- --host 127.0.0.1 --port 4173
 ```
 
-构建产物在 `dist/`，可以直接托管为静态网页。
+预览地址：`http://127.0.0.1:4173/matchmaker-crm/`
 
----
+## 在线地址（GitHub Pages）
 
-## 部署到 GitHub Pages
+- 预期访问地址：`https://shuishen49.github.io/matchmaker-crm/`
+- 已配置工作流：`.github/workflows/deploy.yml`
+- 推送 `main` 分支后自动部署
 
-项目已配置：
-- `vite.config.ts`（生产环境 base 默认 `/matchmaker-crm/`）
-- `.github/workflows/deploy.yml`（推送 `main` 自动部署）
-
-你只需要：
-1. 推送代码到 GitHub 仓库
-2. 打开 `Settings -> Pages`
-3. Source 选择 **GitHub Actions**
-
-部署成功后访问：
-`https://<你的GitHub用户名>.github.io/matchmaker-crm/`
-
----
-
-## 目录结构（简版）
+## 项目结构
 
 ```text
 matchmaker-crm/
-├─ components/
-├─ docs/screenshots/      # README 里用的项目截图
-├─ dist/                  # 构建后的静态产物
+├─ components/             # 页面组件
+├─ docs/screenshots/       # README 截图
+├─ scripts/                # 自动截图脚本
+├─ .github/workflows/      # GitHub Pages 部署工作流
 ├─ App.tsx
 ├─ vite.config.ts
-└─ .github/workflows/deploy.yml
+└─ package.json
 ```
 
----
+## 说明
 
-## 补充说明
-
-如果你的仓库名不是 `matchmaker-crm`，构建时改一下 base：
+若仓库名不是 `matchmaker-crm`，构建时请指定 base：
 
 ```powershell
 $env:VITE_BASE_PATH='/你的仓库名/'; npm run build
 ```
 
-（不改的话，GitHub Pages 可能出现资源 404。）
+避免 GitHub Pages 资源路径 404。

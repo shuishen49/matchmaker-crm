@@ -1,59 +1,82 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 interface FinanceManagerProps {
   activeSubPage: string;
 }
 
+const contractRows = [
+  { id: 'CT-240401', customer: '苏语晴', amount: 18800, received: 12000, pending: 6800, refunded: 0, signer: '王薇', interviewer: '林冉', signDate: '2026-04-01' },
+  { id: 'CT-240402', customer: '沈知野', amount: 36800, received: 20000, pending: 16800, refunded: 0, signer: '林冉', interviewer: '赵辰', signDate: '2026-04-02' },
+  { id: 'CT-240403', customer: '江沐然', amount: 9800, received: 9800, pending: 0, refunded: 0, signer: '王薇', interviewer: '王薇', signDate: '2026-04-02' },
+  { id: 'CT-240404', customer: '夏时', amount: 68800, received: 30000, pending: 38800, refunded: 5000, signer: '周可', interviewer: '赵辰', signDate: '2026-04-03' },
+  { id: 'CT-240405', customer: '顾一', amount: 16800, received: 8000, pending: 8800, refunded: 0, signer: '王薇', interviewer: '李念', signDate: '2026-04-04' },
+  { id: 'CT-240406', customer: '程岚', amount: 26800, received: 26800, pending: 0, refunded: 0, signer: '林冉', interviewer: '林冉', signDate: '2026-04-05' },
+];
+
+const collectionRows = [
+  { id: 'RC-9901', contractId: 'CT-240401', customer: '苏语晴', amount: 12000, method: '微信', signer: '王薇', time: '2026-04-01 15:22' },
+  { id: 'RC-9902', contractId: 'CT-240402', customer: '沈知野', amount: 20000, method: '银行卡', signer: '林冉', time: '2026-04-02 17:08' },
+  { id: 'RC-9903', contractId: 'CT-240403', customer: '江沐然', amount: 9800, method: '支付宝', signer: '王薇', time: '2026-04-02 18:51' },
+  { id: 'RC-9904', contractId: 'CT-240404', customer: '夏时', amount: 30000, method: '银行卡', signer: '周可', time: '2026-04-03 14:37' },
+  { id: 'RC-9905', contractId: 'CT-240405', customer: '顾一', amount: 8000, method: '微信', signer: '王薇', time: '2026-04-04 20:11' },
+  { id: 'RC-9906', contractId: 'CT-240406', customer: '程岚', amount: 26800, method: '支付宝', signer: '林冉', time: '2026-04-05 12:03' },
+];
+
+const refundRows = [
+  { id: 'RF-7001', contractId: 'CT-240404', customer: '夏时', amount: 5000, reason: '阶段调整退款', status: '已退款', approver: '周可', time: '2026-04-06 10:25' },
+  { id: 'RF-7002', contractId: 'CT-240399', customer: '秦朗', amount: 3000, reason: '服务中止', status: '已退款', approver: '陈若', time: '2026-04-05 16:44' },
+  { id: 'RF-7003', contractId: 'CT-240398', customer: '温棠', amount: 1800, reason: '重复缴费冲正', status: '待打款', approver: '陈若', time: '2026-04-05 11:19' },
+  { id: 'RF-7004', contractId: 'CT-240397', customer: '季深', amount: 2600, reason: '活动延期退差价', status: '待审核', approver: '周可', time: '2026-04-04 19:32' },
+];
+
+const salesPerformance = [
+  { name: '王薇', total: 128600, target: 90000, collectSale: 46000, collectInterview: 21000, collectCoop: 9000, contractCount: 6, signAmount: 98400, pendingAmount: 28600, refundSale: 1000, refundInterview: 0, refundCoop: 0 },
+  { name: '林冉', total: 116300, target: 85000, collectSale: 39000, collectInterview: 17000, collectCoop: 6200, contractCount: 5, signAmount: 90200, pendingAmount: 26100, refundSale: 500, refundInterview: 0, refundCoop: 0 },
+  { name: '赵辰', total: 84500, target: 70000, collectSale: 28000, collectInterview: 14500, collectCoop: 5200, contractCount: 4, signAmount: 67800, pendingAmount: 16700, refundSale: 0, refundInterview: 300, refundCoop: 0 },
+  { name: '李念', total: 60300, target: 60000, collectSale: 18000, collectInterview: 13200, collectCoop: 4100, contractCount: 3, signAmount: 48200, pendingAmount: 12100, refundSale: 0, refundInterview: 0, refundCoop: 0 },
+];
+
+const servicePerformance = [
+  { name: '赵辰', total: 73200, target: 65000, collectSale: 12000, collectInterview: 24800, collectCoop: 9000, contractCount: 4, signAmount: 59800, pendingAmount: 13400, refundSale: 0, refundInterview: 800, refundCoop: 0 },
+  { name: '李念', total: 69500, target: 62000, collectSale: 9500, collectInterview: 23200, collectCoop: 8600, contractCount: 4, signAmount: 57100, pendingAmount: 12400, refundSale: 0, refundInterview: 500, refundCoop: 0 },
+  { name: '王薇', total: 52400, target: 50000, collectSale: 8000, collectInterview: 17800, collectCoop: 5200, contractCount: 3, signAmount: 41800, pendingAmount: 10600, refundSale: 0, refundInterview: 0, refundCoop: 0 },
+  { name: '林冉', total: 48800, target: 48000, collectSale: 7600, collectInterview: 16500, collectCoop: 4900, contractCount: 3, signAmount: 39200, pendingAmount: 9600, refundSale: 0, refundInterview: 0, refundCoop: 0 },
+];
+
+const currency = (n: number) => `￥ ${n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 const FinanceManager: React.FC<FinanceManagerProps> = ({ activeSubPage }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [activePerformanceTab, setActivePerformanceTab] = useState('销售业绩');
-  
-  const isContractManagement = activeSubPage === '合同管理';
-  const isCollectionManagement = activeSubPage === '收款管理';
-  const isRefundManagement = activeSubPage === '退款管理';
+
+  const isContract = activeSubPage === '合同管理';
+  const isCollection = activeSubPage === '收款管理';
+  const isRefund = activeSubPage === '退款管理';
   const isPerformance = activeSubPage === '红娘业绩';
 
-  const timeFilters = ['全部', '今天', '昨天', '本周', '上周', '本月', '上月', '今年', '去年'];
+  const contractTotal = useMemo(() => contractRows.reduce((s, r) => s + r.amount, 0), []);
+  const contractReceived = useMemo(() => contractRows.reduce((s, r) => s + r.received, 0), []);
+  const contractPending = useMemo(() => contractRows.reduce((s, r) => s + r.pending, 0), []);
+  const contractRefunded = useMemo(() => contractRows.reduce((s, r) => s + r.refunded, 0), []);
 
-  const SearchItem = ({ label, children, width = "25%", labelWidth = "80px" }: { label: string, children?: React.ReactNode, width?: string, labelWidth?: string }) => (
-    <div className="flex items-center mb-4" style={{ width }}>
-      <label className="text-[13px] text-gray-500 text-right mr-3 shrink-0" style={{ width: labelWidth }}>{label}</label>
-      <div className="flex-1 pr-4">{children}</div>
-    </div>
-  );
+  const collectionTotal = useMemo(() => collectionRows.reduce((s, r) => s + r.amount, 0), []);
+  const refundDone = useMemo(() => refundRows.filter(r => r.status === '已退款').reduce((s, r) => s + r.amount, 0), []);
+  const refundPending = useMemo(() => refundRows.filter(r => r.status !== '已退款').reduce((s, r) => s + r.amount, 0), []);
 
-  const RadioQuery = ({ label, items, activeIdx = 0, labelWidth = "80px" }: { label: string, items: any[], activeIdx?: number, labelWidth?: string }) => (
-    <div className="flex items-start mb-4 border-b border-gray-50 pb-2 last:border-0">
-      <label className="text-[13px] text-gray-500 text-right mr-3 shrink-0 pt-1.5" style={{ width: labelWidth }}>{label}</label>
-      <div className="flex flex-wrap gap-1">
-        {items.map((item, idx) => (
-          <button
-            key={idx}
-            className={`px-3 py-1 text-[13px] rounded transition-all ${
-              idx === activeIdx 
-              ? 'bg-indigo-600 text-white font-bold' 
-              : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  const perfData = activePerformanceTab === '销售业绩' ? salesPerformance : servicePerformance;
+  const perfTarget = perfData.reduce((s, r) => s + r.target, 0);
+  const perfDone = perfData.reduce((s, r) => s + r.total, 0);
+  const perfPct = Math.min(100, Math.round((perfDone / perfTarget) * 100));
 
   return (
     <div className="flex flex-col h-full -m-4 bg-[#f0f2f5] overflow-hidden">
-      {/* 1. 顶部二级页签 */}
       <div className="flex items-center bg-white border-b border-gray-200 h-12 px-4 space-x-1 shrink-0">
         <div className="flex-1 flex items-center overflow-x-auto no-scrollbar space-x-1">
           {['合同管理', '收款管理', '退款管理', '红娘业绩'].map(tab => (
-            <div 
+            <div
               key={tab}
-              onClick={() => {}} // This is handled by parent but kept for UI
               className={`flex items-center h-8 px-4 text-xs cursor-pointer border rounded-t-md transition-all whitespace-nowrap ${
-                activeSubPage === tab 
-                  ? 'bg-white text-indigo-600 border-gray-200 border-b-white z-10 font-bold shadow-[0_-2px_5px_rgba(0,0,0,0.02)]' 
+                activeSubPage === tab
+                  ? 'bg-white text-indigo-600 border-gray-200 border-b-white z-10 font-bold shadow-[0_-2px_5px_rgba(0,0,0,0.02)]'
                   : 'text-gray-500 border-transparent bg-gray-50/50 hover:bg-gray-100'
               }`}
               style={activeSubPage === tab ? { marginBottom: '-1px' } : {}}
@@ -66,249 +89,168 @@ const FinanceManager: React.FC<FinanceManagerProps> = ({ activeSubPage }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
-        {/* 2. 业绩模块特有的顶部切换 */}
         {isPerformance && (
-          <div className="bg-white rounded-t-lg border-b border-gray-100 px-6 pt-4 h-12 flex items-center shrink-0">
-            {['销售业绩', '服务业绩'].map(tab => (
-              <span 
-                key={tab}
-                onClick={() => setActivePerformanceTab(tab)}
-                className={`mr-8 pb-3 text-sm cursor-pointer relative transition-all ${
-                  activePerformanceTab === tab ? 'text-indigo-600 font-bold border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-800'
-                }`}
-              >
-                {tab}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* 3. 业绩模块的进度统计区 */}
-        {isPerformance && (
-          <div className="bg-white p-7 rounded-b-lg border border-t-0 border-gray-100 flex items-center">
-            <div className="w-60 mr-8">
-              <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden">
-                <div className="absolute top-0 left-0 h-full bg-indigo-500 rounded-full w-[0%] transition-all duration-1000"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-gray-600">0%</div>
-              </div>
+          <>
+            <div className="bg-white rounded-t-lg border-b border-gray-100 px-6 pt-4 h-12 flex items-center shrink-0">
+              {['销售业绩', '服务业绩'].map(tab => (
+                <span
+                  key={tab}
+                  onClick={() => setActivePerformanceTab(tab)}
+                  className={`mr-8 pb-3 text-sm cursor-pointer relative transition-all ${
+                    activePerformanceTab === tab ? 'text-indigo-600 font-bold border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  {tab}
+                </span>
+              ))}
             </div>
-            <div className="flex items-center space-x-12">
-               <div className="flex items-center text-[13px] text-gray-500 pr-8 border-r border-gray-100">
-                 本月目标：<span className="text-indigo-600 font-bold ml-1 text-sm">￥ 0.00</span>
-               </div>
-               <div className="flex items-center text-[13px] text-gray-500 pr-8 border-r border-gray-100">
-                 当前已完成：<span className="text-emerald-500 font-bold ml-1 text-sm">￥ 0.00</span>
-               </div>
-               <div className="flex items-center text-[13px] text-gray-500">
-                 距离目标还差：<span className="text-orange-500 font-bold ml-1 text-sm">￥ 0.00</span>
-               </div>
-            </div>
-          </div>
-        )}
-
-        {/* 4. 搜索与筛选 (非业绩展示原版，业绩展示新版) */}
-        {!isPerformance ? (
-          <div className="bg-white shadow-sm border border-gray-100 p-6 rounded-lg">
-            <div className="flex flex-wrap">
-              {isContractManagement && (
-                <>
-                  <SearchItem label="合同编号" labelWidth="90px"><input type="text" placeholder="请输入" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none" /></SearchItem>
-                  <SearchItem label="签约红娘" labelWidth="90px"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                  <SearchItem label="面谈红娘" labelWidth="90px"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                  <SearchItem label="协作红娘" labelWidth="90px"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                </>
-              )}
-              {isCollectionManagement && (
-                <>
-                  <SearchItem label="合同编号"><input type="text" placeholder="请输入" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none" /></SearchItem>
-                  <SearchItem label="收款编号"><input type="text" placeholder="请输入" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none" /></SearchItem>
-                  <SearchItem label="签约红娘"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                  <SearchItem label="面谈红娘"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                </>
-              )}
-              {isRefundManagement && (
-                <>
-                  <SearchItem label="合同编号"><input type="text" placeholder="请输入" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none" /></SearchItem>
-                  <SearchItem label="退款编号"><input type="text" placeholder="请输入" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none" /></SearchItem>
-                  <SearchItem label="签约红娘"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                  <SearchItem label="面谈红娘"><select className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 bg-white"><option>请选择</option></select></SearchItem>
-                </>
-              )}
-              {isExpanded && (
-                <>
-                   {/* ... (此处省略部分展开逻辑) */}
-                   <SearchItem label="编号/昵称"><input type="text" placeholder="资源ID/线上ID/昵称/姓名" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none" /></SearchItem>
-                </>
-              )}
-            </div>
-            <div className="flex items-center justify-end space-x-3 mb-6">
-              <button className="bg-indigo-600 text-white px-6 py-2 rounded text-sm font-bold shadow-md shadow-indigo-100">查询</button>
-              <button className="bg-white border border-gray-200 text-gray-600 px-6 py-2 rounded text-sm font-bold">重置</button>
-              <button onClick={() => setIsExpanded(!isExpanded)} className="text-indigo-600 text-sm font-bold flex items-center">{isExpanded ? '收起' : '展开'} <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'} ml-1`}></i></button>
-            </div>
-            <div className="flex items-center mt-4">
-              <label className={`text-[13px] text-gray-500 text-right mr-3 shrink-0 ${isContractManagement ? 'w-[90px]' : 'w-[80px]'}`}>时间筛选</label>
-              <select className={`text-[13px] border border-gray-200 rounded-l px-3 py-1.5 outline-none bg-gray-50 mr-0 ${isRefundManagement ? 'w-[120px]' : 'w-28'}`}>
-                 <option>{isRefundManagement ? '创建时间' : (isCollectionManagement ? '收款时间' : '签约时间')}</option>
-                 <option>录入时间</option>
-              </select>
-              <div className="flex bg-gray-100 p-1 border-y border-gray-200 overflow-x-auto no-scrollbar shrink-0">
-                {timeFilters.map((f, i) => (<button key={f} className={`px-3 py-1 text-xs rounded transition-colors whitespace-nowrap ${i === 0 ? 'bg-white text-indigo-600 shadow-sm font-bold' : 'text-gray-500'}`}>{f}</button>))}
-              </div>
-              <div className="flex items-center border border-gray-200 border-l-0 rounded-r px-3 py-1.5 text-xs text-gray-400 bg-white min-w-[330px]">
-                 <i className="far fa-calendar-alt mr-3 ml-2"></i><span className="whitespace-nowrap flex-1">开始日期 至 结束日期</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white p-4 px-6 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between sticky top-0 z-20">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center">
-                <label className="text-sm text-gray-500 mr-3">部门</label>
-                <select className="text-[13px] border border-gray-200 rounded px-3 py-1.5 w-[200px] outline-none bg-white"><option>请选择</option></select>
-              </div>
-              <div className="flex items-center">
-                <label className="text-sm text-gray-500 mr-3">红娘</label>
-                <select className="text-[13px] border border-gray-200 rounded px-3 py-1.5 w-[200px] outline-none bg-white"><option>请选择</option></select>
-              </div>
-              <div className="flex items-center">
-                <label className="text-sm text-gray-500 mr-3">选择月份</label>
-                <div className="relative w-[180px]">
-                   <input type="text" placeholder="请选择" className="w-full text-[13px] border border-gray-200 rounded px-3 py-1.5 outline-none pr-8 bg-white" />
-                   <i className="far fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
+            <div className="bg-white p-7 rounded-b-lg border border-t-0 border-gray-100 flex items-center">
+              <div className="w-72 mr-8">
+                <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${perfPct}%` }}></div>
+                  <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-gray-600">{perfPct}%</div>
                 </div>
               </div>
+              <div className="flex items-center space-x-10 text-[13px]">
+                <p className="text-gray-500">本月目标：<span className="text-indigo-600 font-bold">{currency(perfTarget)}</span></p>
+                <p className="text-gray-500">当前已完成：<span className="text-emerald-500 font-bold">{currency(perfDone)}</span></p>
+                <p className="text-gray-500">距离目标还差：<span className="text-orange-500 font-bold">{currency(Math.max(0, perfTarget - perfDone))}</span></p>
+              </div>
             </div>
-            <div className="flex items-center text-gray-400">
-               <span className="iconfont icon-a-1 cursor-pointer hover:text-indigo-600 fz17"></span>
-            </div>
-          </div>
+          </>
         )}
 
-        {/* 5. 汇总条 (业绩模块不展示汇总条) */}
         {!isPerformance && (
           <div className="bg-white p-4 rounded shadow-sm border border-gray-100 flex items-center justify-between">
-            <div className="flex items-center space-x-10 text-[13px]">
-               {isContractManagement && (
-                 <>
-                   <p className="flex items-center text-gray-500">合同总额：<span className="text-indigo-600 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                   <div className="w-px h-4 bg-gray-100"></div>
-                   <p className="flex items-center text-gray-500">已收款：<span className="text-emerald-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                   <div className="w-px h-4 bg-gray-100"></div>
-                   <p className="flex items-center text-gray-500">待收款：<span className="text-orange-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                   <div className="w-px h-4 bg-gray-100"></div>
-                   <p className="flex items-center text-gray-500">已退款：<span className="text-rose-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                 </>
-               )}
-               {isCollectionManagement && (
-                 <>
-                   <p className="flex items-center text-gray-500">已收款：<span className="text-emerald-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                   <div className="w-px h-4 bg-gray-100"></div>
-                   <p className="flex items-center text-gray-500">待收款：<span className="text-orange-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                 </>
-               )}
-               {isRefundManagement && (
-                 <>
-                   <p className="flex items-center text-gray-500">已退款：<span className="text-emerald-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                   <div className="w-px h-4 bg-gray-100"></div>
-                   <p className="flex items-center text-gray-500">待退款：<span className="text-orange-500 font-bold ml-1 text-sm">￥ 0.00</span></p>
-                 </>
-               )}
+            <div className="flex items-center space-x-8 text-[13px]">
+              {isContract && (
+                <>
+                  <p className="text-gray-500">合同总额：<span className="text-indigo-600 font-bold">{currency(contractTotal)}</span></p>
+                  <p className="text-gray-500">已收款：<span className="text-emerald-500 font-bold">{currency(contractReceived)}</span></p>
+                  <p className="text-gray-500">待收款：<span className="text-orange-500 font-bold">{currency(contractPending)}</span></p>
+                  <p className="text-gray-500">已退款：<span className="text-rose-500 font-bold">{currency(contractRefunded)}</span></p>
+                </>
+              )}
+              {isCollection && (
+                <>
+                  <p className="text-gray-500">已收款：<span className="text-emerald-500 font-bold">{currency(collectionTotal)}</span></p>
+                  <p className="text-gray-500">待收款：<span className="text-orange-500 font-bold">{currency(contractPending)}</span></p>
+                </>
+              )}
+              {isRefund && (
+                <>
+                  <p className="text-gray-500">已退款：<span className="text-emerald-500 font-bold">{currency(refundDone)}</span></p>
+                  <p className="text-gray-500">待退款：<span className="text-orange-500 font-bold">{currency(refundPending)}</span></p>
+                </>
+              )}
             </div>
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 flex items-center cursor-pointer hover:text-indigo-600">默认排序 <i className="fas fa-sort-amount-down ml-2 text-gray-300"></i></span>
-              <span className="iconfont icon-a-1 ml-6 text-gray-400 cursor-pointer fz17"></span>
-            </div>
+            <button className="px-4 py-2 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700">导出报表</button>
           </div>
         )}
 
-        {/* 6. 数据表格区域 */}
-        <div className="bg-white rounded shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col min-h-[400px]">
-           {isPerformance ? (
-             <div className="flex-1 overflow-auto custom-scrollbar">
-                <table className="w-full text-left border-collapse min-w-[1860px] table-fixed">
-                  <thead>
-                    <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold">
-                      <th className="px-4 py-3 w-[120px] text-center border-r border-gray-50 sticky left-0 bg-[#f8f9fb] z-20" rowSpan={2}>红娘</th>
-                      <th className="px-4 py-3 w-[150px] text-center border-r border-gray-50" rowSpan={2}>累计业绩(元)</th>
-                      <th className="px-4 py-3 w-[130px] text-center border-r border-gray-50" rowSpan={2}>本月目标(元)</th>
-                      <th className="px-4 py-3 w-[230px] text-center border-r border-gray-50" rowSpan={2}>完成度</th>
-                      <th className="px-4 py-2 text-center border-b border-gray-50" colSpan={3}>收款金额</th>
-                      <th className="px-4 py-3 w-[140px] text-center border-r border-gray-50" rowSpan={2}>签约合同(份)</th>
-                      <th className="px-4 py-3 w-[140px] text-center border-r border-gray-50" rowSpan={2}>签约金额</th>
-                      <th className="px-4 py-3 w-[140px] text-center border-r border-gray-50" rowSpan={2}>待回款金额</th>
-                      <th className="px-4 py-2 text-center border-b border-gray-50" colSpan={3}>退费金额</th>
-                      <th className="px-4 py-3 w-[100px] text-center sticky right-0 bg-[#f8f9fb] z-20 shadow-[-4px_0_8px_rgba(0,0,0,0.03)] border-l border-gray-50" rowSpan={2}>操作</th>
+        <div className="bg-white rounded shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col min-h-[420px]">
+          <div className="flex-1 overflow-auto custom-scrollbar">
+            {isContract && (
+              <table className="w-full text-left border-collapse table-fixed min-w-[1200px]">
+                <thead>
+                  <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold">
+                    <th className="px-4 py-3">合同编号</th><th className="px-4 py-3">客户</th><th className="px-4 py-3">签约金额</th><th className="px-4 py-3">已收</th><th className="px-4 py-3">待收</th><th className="px-4 py-3">已退款</th><th className="px-4 py-3">签约红娘</th><th className="px-4 py-3">面谈红娘</th><th className="px-4 py-3">签约日期</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {contractRows.map(row => (
+                    <tr key={row.id} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-3 text-sm text-gray-500">{row.id}</td><td className="px-4 py-3 text-sm font-medium text-gray-800">{row.customer}</td><td className="px-4 py-3 text-sm">{currency(row.amount)}</td><td className="px-4 py-3 text-sm text-emerald-600">{currency(row.received)}</td><td className="px-4 py-3 text-sm text-orange-500">{currency(row.pending)}</td><td className="px-4 py-3 text-sm text-rose-500">{currency(row.refunded)}</td><td className="px-4 py-3 text-sm">{row.signer}</td><td className="px-4 py-3 text-sm">{row.interviewer}</td><td className="px-4 py-3 text-sm text-gray-500">{row.signDate}</td>
                     </tr>
-                    <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-500 text-[12px]">
-                      <th className="px-4 py-2 w-[130px] text-center border-r border-gray-50">销售</th>
-                      <th className="px-4 py-2 w-[120px] text-center border-r border-gray-50">面谈</th>
-                      <th className="px-4 py-2 w-[120px] text-center border-r border-gray-50">协作</th>
-                      <th className="px-4 py-2 w-[120px] text-center border-r border-gray-50">销售</th>
-                      <th className="px-4 py-2 w-[120px] text-center border-r border-gray-50">面谈</th>
-                      <th className="px-4 py-2 w-[120px] text-center border-r border-gray-50">协作</th>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {isCollection && (
+              <table className="w-full text-left border-collapse table-fixed min-w-[980px]">
+                <thead>
+                  <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold">
+                    <th className="px-4 py-3">收款编号</th><th className="px-4 py-3">合同编号</th><th className="px-4 py-3">客户</th><th className="px-4 py-3">收款金额</th><th className="px-4 py-3">方式</th><th className="px-4 py-3">签约红娘</th><th className="px-4 py-3">收款时间</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {collectionRows.map(row => (
+                    <tr key={row.id} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-3 text-sm text-gray-500">{row.id}</td><td className="px-4 py-3 text-sm">{row.contractId}</td><td className="px-4 py-3 text-sm font-medium text-gray-800">{row.customer}</td><td className="px-4 py-3 text-sm text-emerald-600 font-bold">{currency(row.amount)}</td><td className="px-4 py-3 text-sm">{row.method}</td><td className="px-4 py-3 text-sm">{row.signer}</td><td className="px-4 py-3 text-sm text-gray-500">{row.time}</td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    <tr className="hover:bg-gray-50/50">
-                      <td className="px-4 py-4 text-center text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 border-r border-gray-50">门店管理员</td>
-                      <td className="px-4 py-4 text-center font-bold text-rose-500 text-[13px]">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600 text-[13px]">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center">
-                        <div className="flex items-center px-2">
-                           <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden flex-1">
-                              <div className="absolute top-0 left-0 h-full bg-indigo-500 rounded-full w-[0%]"></div>
-                              <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-gray-600">0%</div>
-                           </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">0</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center text-gray-600">￥ 0.00</td>
-                      <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 shadow-[-4px_0_8px_rgba(0,0,0,0.03)] border-l border-gray-50">
-                        <button className="text-indigo-600 text-sm font-bold hover:underline">查看</button>
-                      </td>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {isRefund && (
+              <table className="w-full text-left border-collapse table-fixed min-w-[1050px]">
+                <thead>
+                  <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold">
+                    <th className="px-4 py-3">退款编号</th><th className="px-4 py-3">合同编号</th><th className="px-4 py-3">客户</th><th className="px-4 py-3">退款金额</th><th className="px-4 py-3">退款原因</th><th className="px-4 py-3">状态</th><th className="px-4 py-3">审批人</th><th className="px-4 py-3">时间</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {refundRows.map(row => (
+                    <tr key={row.id} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-3 text-sm text-gray-500">{row.id}</td><td className="px-4 py-3 text-sm">{row.contractId}</td><td className="px-4 py-3 text-sm font-medium text-gray-800">{row.customer}</td><td className="px-4 py-3 text-sm text-rose-500 font-bold">{currency(row.amount)}</td><td className="px-4 py-3 text-sm">{row.reason}</td><td className="px-4 py-3 text-sm"><span className={`px-2 py-1 rounded text-xs ${row.status === '已退款' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{row.status}</span></td><td className="px-4 py-3 text-sm">{row.approver}</td><td className="px-4 py-3 text-sm text-gray-500">{row.time}</td>
                     </tr>
-                    {/* 其他红娘行数据... */}
-                  </tbody>
-                </table>
-             </div>
-           ) : (
-             <div className="flex-1 flex flex-col items-center justify-center">
-                <img src="https://scrm.oss-cn-beijing.aliyuncs.com/assets/no_data-78230080.png" className="w-40 opacity-60" alt="No data" />
-                <p className="text-gray-400 text-base font-medium mt-4">暂无数据</p>
-             </div>
-           )}
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {isPerformance && (
+              <table className="w-full text-left border-collapse min-w-[1700px] table-fixed">
+                <thead>
+                  <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold">
+                    <th className="px-4 py-3 w-[110px] text-center">红娘</th>
+                    <th className="px-4 py-3 w-[140px] text-center">累计业绩</th>
+                    <th className="px-4 py-3 w-[130px] text-center">本月目标</th>
+                    <th className="px-4 py-3 w-[210px] text-center">完成度</th>
+                    <th className="px-4 py-3 w-[120px] text-center">收款(销售)</th>
+                    <th className="px-4 py-3 w-[120px] text-center">收款(面谈)</th>
+                    <th className="px-4 py-3 w-[120px] text-center">收款(协作)</th>
+                    <th className="px-4 py-3 w-[130px] text-center">签约合同</th>
+                    <th className="px-4 py-3 w-[120px] text-center">签约金额</th>
+                    <th className="px-4 py-3 w-[120px] text-center">待回款</th>
+                    <th className="px-4 py-3 w-[120px] text-center">退费(销售)</th>
+                    <th className="px-4 py-3 w-[120px] text-center">退费(面谈)</th>
+                    <th className="px-4 py-3 w-[120px] text-center">退费(协作)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {perfData.map(row => {
+                    const pct = Math.min(100, Math.round((row.total / row.target) * 100));
+                    return (
+                      <tr key={row.name} className="hover:bg-gray-50/50">
+                        <td className="px-4 py-3 text-center font-medium text-gray-800">{row.name}</td>
+                        <td className="px-4 py-3 text-center text-rose-500 font-bold">{currency(row.total)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.target)}</td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-gray-100 rounded-full overflow-hidden relative">
+                            <div className="h-full bg-indigo-500" style={{ width: `${pct}%` }}></div>
+                            <span className="absolute inset-0 text-[10px] flex items-center justify-center text-gray-600 font-bold">{pct}%</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">{currency(row.collectSale)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.collectInterview)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.collectCoop)}</td>
+                        <td className="px-4 py-3 text-center">{row.contractCount}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.signAmount)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.pendingAmount)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.refundSale)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.refundInterview)}</td>
+                        <td className="px-4 py-3 text-center">{currency(row.refundCoop)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
-
-        {/* 7. 分页 */}
-        {!isPerformance && (
-          <div className="flex items-center justify-between bg-white px-6 py-4 rounded shadow-sm border border-gray-100">
-             <div className="text-sm text-gray-400">共 0 条</div>
-             <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <div className="flex items-center border border-gray-200 rounded px-3 py-1.5 bg-white cursor-pointer hover:border-indigo-400">
-                   <span>20条/页</span>
-                   <i className="fas fa-chevron-down ml-3 text-[10px] text-gray-300"></i>
-                </div>
-                <div className="flex items-center space-x-1">
-                   <button className="w-8 h-8 rounded border border-gray-100 flex items-center justify-center text-gray-300"><i className="fas fa-chevron-left text-xs"></i></button>
-                   <button className="w-8 h-8 rounded bg-indigo-600 text-white font-bold flex items-center justify-center">1</button>
-                   <button className="w-8 h-8 rounded border border-gray-100 flex items-center justify-center text-gray-300"><i className="fas fa-chevron-right text-xs"></i></button>
-                </div>
-                <div className="flex items-center">
-                   <span>前往</span>
-                   <input type="text" className="w-10 border border-gray-200 mx-2 py-1 text-center rounded focus:border-indigo-400 outline-none" defaultValue="1" />
-                   <span>页</span>
-                </div>
-             </div>
-          </div>
-        )}
       </div>
     </div>
   );

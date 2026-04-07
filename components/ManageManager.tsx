@@ -44,6 +44,15 @@ const ManageManager: React.FC<ManageManagerProps> = ({ activeSubPage }) => {
     { id: '2163', name: '运营', scope: '本人数据', desc: '--', time: '2026-01-16 13:53' },
   ];
 
+  const staff = [
+    { id: 'RM-301', name: '王薇', dept: '销售部', role: '销售红娘', phone: '138****1023', status: '在职', entry: '2025-05-16' },
+    { id: 'RM-302', name: '林冉', dept: '销售部', role: '销售红娘', phone: '139****7741', status: '在职', entry: '2025-09-08' },
+    { id: 'RM-303', name: '赵辰', dept: '服务部', role: '服务红娘', phone: '137****6652', status: '在职', entry: '2024-11-03' },
+    { id: 'RM-304', name: '李念', dept: '服务部', role: '服务红娘', phone: '186****2309', status: '在职', entry: '2025-02-19' },
+    { id: 'RM-305', name: '陈若', dept: '财务部', role: '运营', phone: '133****5820', status: '试用', entry: '2026-01-22' },
+    { id: 'RM-306', name: '周可', dept: '运营部', role: '店长', phone: '136****4418', status: '在职', entry: '2024-07-11' },
+  ];
+
   return (
     <div className="flex flex-col h-full -m-4 bg-[#f0f2f5] overflow-hidden">
       {/* 顶部标签栏 */}
@@ -147,11 +156,50 @@ const ManageManager: React.FC<ManageManagerProps> = ({ activeSubPage }) => {
           </div>
         )}
 
-        {/* 红娘管理 (Placeholder) */}
+        {/* 红娘管理 */}
         {isStaffManage && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-12 flex flex-col items-center justify-center min-h-[500px]">
-            <img src="https://scrm.oss-cn-beijing.aliyuncs.com/assets/no_data-78230080.png" className="w-40 opacity-60" alt="No data" />
-            <p className="text-gray-400 text-base font-medium mt-4">红娘管理功能开发中...</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-50">
+              <div className="text-sm text-gray-500">共 {staff.length} 位红娘/成员</div>
+              <button className="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">新增成员</button>
+            </div>
+            <div className="flex-1 overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left border-collapse table-fixed min-w-[980px]">
+                <thead>
+                  <tr className="bg-[#f8f9fb] border-b border-gray-100 text-gray-600 text-[13px] font-bold">
+                    <th className="px-4 py-4 w-[120px]">成员ID</th>
+                    <th className="px-4 py-4 w-[120px]">姓名</th>
+                    <th className="px-4 py-4 w-[160px]">部门</th>
+                    <th className="px-4 py-4 w-[140px]">角色</th>
+                    <th className="px-4 py-4 w-[150px]">手机号</th>
+                    <th className="px-4 py-4 w-[140px]">状态</th>
+                    <th className="px-4 py-4 w-[150px]">入职时间</th>
+                    <th className="px-4 py-4">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {staff.map(person => (
+                    <tr key={person.id} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-4 text-sm text-gray-500">{person.id}</td>
+                      <td className="px-4 py-4 text-sm font-medium text-gray-800">{person.name}</td>
+                      <td className="px-4 py-4 text-sm text-gray-600">{person.dept}</td>
+                      <td className="px-4 py-4 text-sm text-gray-600">{person.role}</td>
+                      <td className="px-4 py-4 text-sm text-gray-600">{person.phone}</td>
+                      <td className="px-4 py-4 text-sm">
+                        <span className={`px-2 py-1 rounded text-xs ${person.status === '在职' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                          {person.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-500">{person.entry}</td>
+                      <td className="px-4 py-4 text-sm">
+                        <button className="text-indigo-600 font-bold hover:underline mr-4">编辑</button>
+                        <button className="text-rose-500 font-bold hover:underline">停用</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
